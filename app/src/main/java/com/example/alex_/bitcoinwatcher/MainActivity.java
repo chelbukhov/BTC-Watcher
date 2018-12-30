@@ -2,6 +2,7 @@ package com.example.alex_.bitcoinwatcher;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -32,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String CBR_ENDPOINT = "https://www.cbr-xml-daily.ru/daily_json.js";
 
+
+
     private OkHttpClient okHttpClient = new OkHttpClient();
     private ProgressDialog progressDialog;
     private TextView txt;
@@ -43,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     private double btcRubRate;
 
     private String btcTxt;
+    private String[] addresses = {"alex_sysadm@rambler.ru"};
+    private String subject = "Feedback from BTC Watcher";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,21 +61,33 @@ public class MainActivity extends AppCompatActivity {
         txtBTCrate = findViewById(R.id.txtBTCrate);
 
         progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("BIP Loading");
+        progressDialog.setTitle("BIP loading");
         progressDialog.setMessage("Wait...");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                composeEmail();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
             }
         });
 
         load();
         loadCBR();
     }
+
+    public void composeEmail() {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+        intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -102,6 +119,10 @@ public class MainActivity extends AppCompatActivity {
             startActivity(settings);
         }
 
+        if (id == R.id.action_summary) {
+            Intent summary = new Intent(MainActivity.this, ReportActivity.class);
+            startActivity(summary);
+        }
         return super.onOptionsItemSelected(item);
     }
 

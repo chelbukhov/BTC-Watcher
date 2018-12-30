@@ -8,9 +8,15 @@
         android:title="Reload"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_summary"
+        android:orderInCategory="50"
+        android:title="Summary report"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="50"
         android:title="Settings"
+        android:visible="false"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_about"

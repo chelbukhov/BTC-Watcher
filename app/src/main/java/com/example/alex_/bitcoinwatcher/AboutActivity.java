@@ -15,7 +15,8 @@ public class AboutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_about);
 
         about = findViewById(R.id.txtAbout);
-        strAbout = "About program." + "\n" + "autor: Chelbukhov Aleksey" + "\n" + "2018";
+        strAbout = "About program" + "\n\n\n" + "The program is designed to display bitcoin blockchain data from various sources." + "\n"
+                + "Developer: Chelbukhov Aleksey" + "\n" + "2018";
         about.setText(strAbout);
     }
 }
