@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public static final String BPI_ENDPOINT = "https://api.coindesk.com/v1/bpi/currentprice.json";
+    public static final String ETH_ENDPOINT = "https://api.pro.coinbase.com/products/ETH-USD/ticker";
 
     public static final String CBR_ENDPOINT = "https://www.cbr-xml-daily.ru/daily_json.js";
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView txt;
     private  TextView txtCBRrate;
     private TextView txtBTCrate;
+    private TextView txtETHrate;
 
     private double usdRate;
     private double btcRate;
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         txt = findViewById(R.id.txt);
         txtCBRrate = findViewById(R.id.txtCBRrate);
         txtBTCrate = findViewById(R.id.txtBTCrate);
+        txtETHrate = findViewById(R.id.txtETHrate);
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("BIP loading");
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
         load();
         loadCBR();
+        loadETH();
     }
 
     public void composeEmail() {
@@ -107,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_load) {
             load();
             loadCBR();
+            loadETH();
         }
 
         if (id == R.id.action_about) {
@@ -254,4 +259,54 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+    private void loadETH() {
+        // try load ETH rate from https://api.pro.coinbase.com/products/ETH-USD/ticker
+        progressDialog.setTitle("ETH rates loading");
+
+        Request request = new Request.Builder().url(ETH_ENDPOINT).build();
+        progressDialog.show();
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Toast.makeText(MainActivity.this,"Error during ETH rates loading..." + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String body = response.body().string();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+                        Log.i("myinfo: ", body);
+                        parseETHresponce(body);
+                    }
+                });
+            }
+        });
+    }
+
+    private void parseETHresponce(String data) {
+        txtETHrate.setVisibility(View.VISIBLE);
+        try {
+            StringBuilder builder = new StringBuilder();
+            JSONObject jsonObject = new JSONObject(data);
+
+            double ethRate = jsonObject.getDouble("price");
+            String strethRate =  new DecimalFormat("#0.00").format(ethRate);
+            Log.i("myinfo_data: ", data);
+            Log.i("myinfo_ethRate: ", strethRate);
+
+            builder.append("1 ETH = ").append(strethRate).append(" USD").append("\n");
+
+            txtETHrate.setText(builder.toString());
+
+        } catch (Exception e){
+            Log.i("myinfo_error: ", e.toString());
+            // txtCBRrate.setText(e.toString());
+
+        }
+    }
+
 }
